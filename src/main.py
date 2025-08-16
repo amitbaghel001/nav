@@ -128,6 +128,9 @@ class VisionGuideAI:
                     time.sleep(0.1)
                     continue
                 
+                # Fix camera mirroring - flip horizontally
+                frame = cv2.flip(frame, 1)  # 1 = horizontal flip
+
                 # Detect objects
                 detected_objects = self.object_detector.detect_objects(
                     frame, 
@@ -179,9 +182,25 @@ class VisionGuideAI:
                 for obj in detected_objects:
                     if obj.distance:
                         x1, y1, x2, y2 = obj.bbox
-                        distance_text = f"{obj.distance:.1f} steps"
-                        cv2.putText(display_frame, distance_text, 
-                                (x1, y2 + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1)
+                        
+                        # Format distance display
+                        distance_steps = obj.distance
+                        distance_meters = distance_steps * config.navigation.step_size
+                        
+                        # Choose appropriate display format
+                        if distance_steps < 1.5:
+                            distance_text = f"very close"
+                            color = (0, 0, 255)  # Red for very close
+                        elif distance_steps < 3.0:
+                            distance_text = f"{distance_steps:.1f} steps"
+                            color = (0, 165, 255)  # Orange for close
+                        else:
+                            distance_text = f"{distance_steps:.0f} steps"
+                            color = (0, 255, 0)  # Green for far
+                        
+                        # Display with colored text
+                        cv2.putText(display_frame, distance_text,
+                                (x1, y2 + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
                 
                 # Add control instructions
                 instructions = [
