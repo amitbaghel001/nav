@@ -6,6 +6,7 @@ import urllib.request
 import os
 from loguru import logger
 
+from .calibration_system import SmartDepthCalibrator
 class DepthEstimator:
     def __init__(self, model_type: str = "MiDaS_small"):
         """Initialize depth estimation model"""
@@ -39,6 +40,9 @@ class DepthEstimator:
             (0.9, 1.0): 10.0,
         }
         
+        # Add calibration system
+        self.calibrator = SmartDepthCalibrator()
+
         self._load_model()
         
     def _load_model(self):
@@ -167,27 +171,8 @@ class DepthEstimator:
             return 2.0
     
     def _depth_to_distance(self, depth_value: float) -> float:
-        """Convert MiDaS depth value to real-world distance"""
-        try:
-            # MiDaS outputs inverse depth, so LARGER values = CLOSER objects
-            # We need to invert this relationship
-            
-            if depth_value <= 0:
-                return self.max_distance
-            
-            # Simple inverse relationship - the key fix
-            # Higher depth values should give SMALLER distances
-            base_distance = 5.0  # Base calibration distance in meters
-            distance = base_distance / (depth_value + 0.1)  # Add small value to avoid division by zero
-            
-            # Clamp to reasonable range
-            distance = max(self.min_distance, min(distance, self.max_distance))
-            
-            return distance
-            
-        except Exception as e:
-            logger.error(f"Depth conversion failed: {e}")
-            return 2.0
+        """Convert MiDaS depth value to real-world distance using calibration"""
+        return self.calibrator.depth_to_distance(depth_value)
 
     
     def get_distance_category(self, distance_steps: float) -> str:
@@ -257,3 +242,32 @@ class DepthEstimator:
             self.model = None
             self.transform = None
             logger.warning("Using dummy depth estimation")
+
+    def add_calibration_point(self, frame: np.ndarray, bbox, real_distance: float, 
+                            confidence: float = 0.8):
+        """Add calibration point directly to depth estimator"""
+        depth_map = self.estimate_depth(frame)
+        depth_value = self._extract_depth_from_bbox(depth_map, bbox)
+        
+        if depth_value > 0:
+            return self.calibrator.add_calibration_point(
+                depth_value, real_distance, confidence
+            )
+        return False
+    
+    def _extract_depth_from_bbox(self, depth_map: np.ndarray, bbox) -> float:
+        """Extract median depth value from bounding box"""
+        x1, y1, x2, y2 = bbox
+        h, w = depth_map.shape
+        x1, y1 = max(0, x1), max(0, y1)
+        x2, y2 = min(w, x2), min(h, y2)
+        
+        if x2 <= x1 or y2 <= y1:
+            return 0
+        
+        roi_depth = depth_map[y1:y2, x1:x2]
+        return float(np.median(roi_depth))
+    
+    def get_calibration_quality(self) -> dict:
+        """Get calibration quality metrics"""
+        return self.calibrator.get_calibration_quality()

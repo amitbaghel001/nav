@@ -143,7 +143,7 @@ class ObjectDetector:
             # Prepare label
             label = f"{obj.class_name}: {obj.confidence:.2f}"
             if obj.distance:
-                label += f" ({obj.distance:.1f}m)"
+                label += f" ({obj.distance:.1f} steps)"
             
             # Draw label background
             (label_width, label_height), _ = cv2.getTextSize(

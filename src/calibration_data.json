@@ -1,0 +1,237 @@
+{
+  "calibration_points": [
+    {
+      "depth_value": 0.16174237430095673,
+      "real_distance_meters": 1.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755374652.7541056,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.8522239923477173,
+      "real_distance_meters": 1.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755374729.2681272,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.7078768014907837,
+      "real_distance_meters": 2.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755374766.040089,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.9558868408203125,
+      "real_distance_meters": 1.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755374864.4817019,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.2561180293560028,
+      "real_distance_meters": 2.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755374890.9803004,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.8722689151763916,
+      "real_distance_meters": 1.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755375056.7548907,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.23049020767211914,
+      "real_distance_meters": 2.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755375099.73929,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.06688912957906723,
+      "real_distance_meters": 3.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755375141.9194827,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.9260836839675903,
+      "real_distance_meters": 1.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755375358.2313573,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.8599621653556824,
+      "real_distance_meters": 2.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755375385.2332103,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.30410316586494446,
+      "real_distance_meters": 3.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755375418.9914725,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.10402979701757431,
+      "real_distance_meters": 5.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755375458.6004176,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.863632321357727,
+      "real_distance_meters": 1.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755375707.5053847,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.7528042793273926,
+      "real_distance_meters": 3.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755375777.1301618,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.24966663122177124,
+      "real_distance_meters": 5.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755375835.2058792,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.59150630235672,
+      "real_distance_meters": 3.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755375973.10881,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.10607998818159103,
+      "real_distance_meters": 3.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755376121.1152582,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    },
+    {
+      "depth_value": 0.07034284621477127,
+      "real_distance_meters": 5.0,
+      "confidence_score": 0.9,
+      "timestamp": 1755376289.529113,
+      "frame_size": [
+        640,
+        480
+      ],
+      "object_class": "unknown"
+    }
+  ],
+  "models": {
+    "polynomial": {
+      "model_type": "polynomial",
+      "parameters": [
+        -1.763924612861386,
+        -0.8950624687987309,
+        3.5248431781666913
+      ],
+      "accuracy_score": 1.0417881592523943,
+      "calibration_date": "2025-08-17 02:01:30",
+      "sample_count": 18
+    },
+    "power": {
+      "model_type": "power",
+      "parameters": [
+        -2.734426636348533,
+        3.789186053450278,
+        3.021821305877565
+      ],
+      "accuracy_score": 1.029555138419756,
+      "calibration_date": "2025-08-17 01:53:55",
+      "sample_count": 15
+    }
+  },
+  "active_model": {
+    "model_type": "polynomial",
+    "parameters": [
+      -1.763924612861386,
+      -0.8950624687987309,
+      3.5248431781666913
+    ],
+    "accuracy_score": 1.0417881592523943,
+    "calibration_date": "2025-08-17 02:01:30",
+    "sample_count": 18
+  }
+}

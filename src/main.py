@@ -8,6 +8,8 @@ import sys
 from pathlib import Path
 import signal
 
+from core.easy_calibrator import EasyCalibrator
+
 # Add src to path
 sys.path.append(str(Path(__file__).parent))
 
@@ -41,6 +43,8 @@ class VisionGuideAI:
         self.auto_announce_changes = True
         self.periodic_summary_interval = 30.0  # Summary every 30 seconds
         self.last_summary_time = 0
+
+        self.easy_calibrator = EasyCalibrator(self.depth_estimator)
         
         logger.info("VisionGuide AI initialized successfully")
     
@@ -212,6 +216,9 @@ class VisionGuideAI:
                     "T - Test audio",
                     "A - Toggle auto-announce",
                     "C - Current scene summary",
+                    "M - Manual calibration",      # ADD THIS
+                    "N - Calibration status",      # ADD THIS
+                    "X - Reset calibration",       # ADD THIS
                     "SPACE - Stop talking"
                 ]
                 
@@ -282,6 +289,19 @@ class VisionGuideAI:
                     # Stop talking
                     self.audio_processor.stop_speaking()
                     logger.info("Speech stopped by user")
+
+                # ADD THESE NEW CONTROLS AFTER THE SPACE KEY HANDLER:
+                elif key == ord('m') or key == ord('M'):
+                    # Manual calibration mode
+                    self.manual_calibration_mode(frame, detected_objects)
+
+                elif key == ord('n') or key == ord('N'):
+                    # Show calibration status
+                    self.show_calibration_status()
+
+                elif key == ord('x') or key == ord('X'):
+                    # Reset calibration
+                    self.reset_calibration()
                 
                 # Small delay
                 time.sleep(0.03)
@@ -399,6 +419,96 @@ class VisionGuideAI:
         except Exception as e:
             logger.error(f"Failed to add person {name}: {e}")
             return False
+        
+    def manual_calibration_mode(self, frame, detected_objects):
+        """Enter manual calibration mode"""
+        if not detected_objects:
+            self.audio_processor.speak_immediately("No objects detected for calibration")
+            return
+        
+        # Find closest object
+        closest_obj = min(detected_objects, 
+                        key=lambda obj: obj.distance if obj.distance else float('inf'))
+        
+        self.audio_processor.speak_immediately(
+            f"Ready to calibrate {closest_obj.class_name}. Press 1 for 1 meter, 2 for 2 meters, 3 for 3 meters, or 5 for 5 meters"
+        )
+        
+        # Wait for user input
+        print(f"Calibrating {closest_obj.class_name}. Enter distance in meters (1, 2, 3, or 5): ")
+        try:
+            # Simple keyboard input for distance
+            start_time = time.time()
+            selected_distance = None
+            
+            while time.time() - start_time < 10:  # 10 second timeout
+                key = cv2.waitKey(100) & 0xFF
+                if key == ord('1'):
+                    selected_distance = 1.0
+                    break
+                elif key == ord('2'):
+                    selected_distance = 2.0
+                    break
+                elif key == ord('3'):
+                    selected_distance = 3.0
+                    break
+                elif key == ord('5'):
+                    selected_distance = 5.0
+                    break
+                elif key == ord('q') or key == ord('Q'):
+                    self.audio_processor.speak_immediately("Calibration cancelled")
+                    return
+            
+            if selected_distance:
+                success = self.depth_estimator.add_calibration_point(
+                    frame, closest_obj.bbox, selected_distance, confidence=0.9
+                )
+                
+                if success:
+                    self.audio_processor.speak_immediately(f"Calibration point added at {selected_distance} meters")
+                    logger.info(f"Calibration successful: {closest_obj.class_name} at {selected_distance}m")
+                else:
+                    self.audio_processor.speak_immediately("Calibration failed")
+            else:
+                self.audio_processor.speak_immediately("Calibration timeout. No distance selected")
+                
+        except Exception as e:
+            logger.error(f"Manual calibration failed: {e}")
+            self.audio_processor.speak_immediately("Calibration error occurred")
+
+    def show_calibration_status(self):
+        """Show current calibration status"""
+        try:
+            status = self.easy_calibrator.get_calibration_status()
+            
+            if status['is_calibrated']:
+                quality_text = "excellent" if status['quality_score'] > 0.8 else "good" if status['quality_score'] > 0.6 else "fair" if status['quality_score'] > 0.4 else "poor"
+                message = f"Calibration is {quality_text} with {status['sample_count']} data points using {status['model_type']} model"
+            else:
+                message = "No calibration active. Distance estimates may be inaccurate. Press M to calibrate"
+            
+            self.audio_processor.speak_immediately(message)
+            logger.info(f"Calibration Status: {status}")
+            
+            # Show recommendations
+            if 'recommendations' in status and status['recommendations']:
+                for rec in status['recommendations'][:2]:  # Limit to 2 recommendations
+                    self.audio_processor.speak_async(rec, AudioPriority.LOW)
+                    
+        except Exception as e:
+            logger.error(f"Failed to get calibration status: {e}")
+            self.audio_processor.speak_immediately("Unable to get calibration status")
+
+    def reset_calibration(self):
+        """Reset calibration data"""
+        try:
+            self.depth_estimator.calibrator.reset_calibration()
+            self.audio_processor.speak_immediately("Calibration data has been reset")
+            logger.info("Calibration reset by user")
+        except Exception as e:
+            logger.error(f"Failed to reset calibration: {e}")
+            self.audio_processor.speak_immediately("Failed to reset calibration")
+
 
 def signal_handler(signum, frame):
     """Handle Ctrl+C gracefully"""
