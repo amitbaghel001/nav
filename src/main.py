@@ -336,7 +336,7 @@ class VisionGuideAI:
             self.audio_processor.speak_immediately("Listening... Speak your command now")
             
             # Listen for command with enhanced recognition
-            command = self.audio_processor.listen_for_command(timeout=6, phrase_limit=6)
+            command = self.audio_processor.listen_for_command(timeout=6, phrase_time_limit=6)
             
             if command:
                 logger.info(f"Voice command received: '{command}'")
