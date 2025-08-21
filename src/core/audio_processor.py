@@ -30,24 +30,201 @@ class SmartVoiceCommandProcessor:
     def __init__(self):
         self.command_patterns = {
             'describe_scene': [
-                r'what do you see', r'describe scene', r'tell me what\'s here',
-                r'what\'s in front of me', r'what\'s around me', r'what\'s there'
-            ],
-            'repeat_last': [
-                r'repeat', r'say again', r'say that again', r'what did you say'
-            ],
-            'stop_talking': [
-                r'stop talking', r'be quiet', r'silence', r'shut up', r'stop', r'mute'
-            ],
-            'emergency': [
-                r'help me', r'emergency', r'call for help', r'get help'
-            ],
-            'get_location': [
-                r'where am i', r'what\'s my location', r'current location'
-            ],
-            'volume_up': [r'volume up', r'louder', r'increase volume'],
-            'volume_down': [r'volume down', r'quieter', r'decrease volume'],
-            'status': [r'system status', r'how are you', r'status report']
+        r'what do you see',
+        r'describe scene',
+        r'tell me what\'s here',
+        r'what\'s in front of me',
+        r'what\'s around me',
+        r'describe surroundings',
+        r'what\'s there',
+        r'what can you see',
+        r'describe what\'s here',
+        r'tell me about the scene',
+        r'what objects are here',
+        r'what\'s nearby',
+        r'scan the area',
+        r'look around',
+        r'what\'s present',
+        r'identify objects',
+        r'what am i looking at',
+        r'analyze scene',
+        r'what\'s visible',
+        r'give me details'
+    ],
+    
+    # Navigation commands
+    'repeat_last': [
+        r'repeat',
+        r'say again',
+        r'say that again',
+        r'repeat last',
+        r'what did you say',
+        r'could you repeat',
+        r'pardon',
+        r'excuse me',
+        r'i didn\'t catch that',
+        r'come again',
+        r'repeat that',
+        r'say it again',
+        r'one more time',
+        r'didn\'t hear you',
+        r'missed that'
+    ],
+    
+    # Control commands
+    'stop_talking': [
+        r'stop talking',
+        r'be quiet',
+        r'silence',
+        r'shut up',
+        r'stop speaking',
+        r'mute',
+        r'quiet',
+        r'hush',
+        r'stop',
+        r'enough',
+        r'pause',
+        r'stop now',
+        r'be silent',
+        r'no more',
+        r'that\'s enough'
+    ],
+    
+    # Emergency commands
+    'emergency': [
+        r'help me',
+        r'emergency',
+        r'call for help',
+        r'get help',
+        r'i need help',
+        r'assistance',
+        r'urgent',
+        r'crisis',
+        r'emergency help',
+        r'call emergency',
+        r'need assistance',
+        r'help please',
+        r'emergency situation',
+        r'urgent help',
+        r'immediate help',
+        r'panic',
+        r'danger',
+        r'trouble',
+        r'call someone',
+        r'get someone'
+    ],
+    
+    # Location commands
+    'get_location': [
+        r'where am i',
+        r'what\'s my location',
+        r'where is this',
+        r'current location',
+        r'my position',
+        r'where are we',
+        r'what place is this',
+        r'location please',
+        r'tell me location',
+        r'find my location',
+        r'gps location',
+        r'coordinates',
+        r'address',
+        r'what\'s the address',
+        r'where exactly am i'
+    ],
+    
+    # Audio control commands
+    'volume_up': [
+        r'volume up',
+        r'louder',
+        r'increase volume',
+        r'turn up',
+        r'speak louder',
+        r'higher volume',
+        r'boost volume',
+        r'make it louder',
+        r'turn volume up',
+        r'increase sound',
+        r'more volume',
+        r'amplify'
+    ],
+    
+    'volume_down': [
+        r'volume down',
+        r'quieter',
+        r'decrease volume',
+        r'turn down',
+        r'speak quieter',
+        r'lower volume',
+        r'reduce volume',
+        r'make it quieter',
+        r'turn volume down',
+        r'decrease sound',
+        r'less volume',
+        r'softer'
+    ],
+    
+    'speed_up': [
+        r'speak faster',
+        r'speed up',
+        r'talk faster',
+        r'faster speech',
+        r'increase speed',
+        r'talk quickly',
+        r'speak quickly',
+        r'more speed',
+        r'accelerate speech',
+        r'quick speech'
+    ],
+    
+    'slow_down': [
+        r'speak slower',
+        r'slow down',
+        r'talk slower',
+        r'slower speech',
+        r'decrease speed',
+        r'talk slowly',
+        r'speak slowly',
+        r'less speed',
+        r'decelerate speech',
+        r'slow speech'
+    ],
+    
+    # Calibration commands
+    'calibrate': [
+        r'calibrate',
+        r'calibration',
+        r'adjust distance',
+        r'fix distance',
+        r'calibrate distance',
+        r'distance calibration',
+        r'adjust measurements',
+        r'fix measurements',
+        r'tune distance',
+        r'correct distance',
+        r'set distance',
+        r'configure distance',
+        r'distance setup',
+        r'measurement setup'
+    ],
+    
+    # System commands
+    'status': [
+        r'system status',
+        r'how are you',
+        r'status report',
+        r'check status',
+        r'system check',
+        r'health check',
+        r'are you working',
+        r'system info',
+        r'diagnostic',
+        r'report status',
+        r'how\'s the system',
+        r'everything ok',
+        r'system report',
+        r'check system'
+    ]
         }
         
         self.compiled_patterns = {}
