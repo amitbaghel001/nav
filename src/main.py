@@ -451,39 +451,35 @@ class VisionGuideAI:
             return False
         
     def manual_calibration_mode(self, frame, detected_objects):
-        """Enter manual calibration mode"""
+        """Enter manual calibration mode with compensation for manual scaling"""
         if not detected_objects:
             self.audio_processor.speak_immediately("No objects detected for calibration")
             return
         
-        # Find closest object
-        closest_obj = min(detected_objects, 
+        closest_obj = min(detected_objects,
                         key=lambda obj: obj.distance if obj.distance else float('inf'))
         
         self.audio_processor.speak_immediately(
             f"Ready to calibrate {closest_obj.class_name}. Press 1 for 1 meter, 2 for 2 meters, 3 for 3 meters, or 5 for 5 meters"
         )
         
-        # Wait for user input
-        print(f"Calibrating {closest_obj.class_name}. Enter distance in meters (1, 2, 3, or 5): ")
         try:
-            # Simple keyboard input for distance
             start_time = time.time()
             selected_distance = None
             
-            while time.time() - start_time < 10:  # 10 second timeout
+            while time.time() - start_time < 10:
                 key = cv2.waitKey(100) & 0xFF
                 if key == ord('1'):
-                    selected_distance = 1.0
+                    selected_distance = 1.0 * 2  # Multiply by 2 to compensate
                     break
                 elif key == ord('2'):
-                    selected_distance = 2.0
+                    selected_distance = 2.0 * 2  # Multiply by 2 to compensate
                     break
                 elif key == ord('3'):
-                    selected_distance = 3.0
+                    selected_distance = 3.0 * 2  # Multiply by 2 to compensate
                     break
                 elif key == ord('5'):
-                    selected_distance = 5.0
+                    selected_distance = 5.0 * 2  # Multiply by 2 to compensate
                     break
                 elif key == ord('q') or key == ord('Q'):
                     self.audio_processor.speak_immediately("Calibration cancelled")
@@ -494,9 +490,10 @@ class VisionGuideAI:
                     frame, closest_obj.bbox, selected_distance, confidence=0.9
                 )
                 
+                actual_distance = selected_distance / 2  # Show user the actual distance
                 if success:
-                    self.audio_processor.speak_immediately(f"Calibration point added at {selected_distance} meters")
-                    logger.info(f"Calibration successful: {closest_obj.class_name} at {selected_distance}m")
+                    self.audio_processor.speak_immediately(f"Calibration point added at {actual_distance} meters")
+                    logger.info(f"Calibration successful: {closest_obj.class_name} at {actual_distance}m (compensated: {selected_distance}m)")
                 else:
                     self.audio_processor.speak_immediately("Calibration failed")
             else:
@@ -505,6 +502,7 @@ class VisionGuideAI:
         except Exception as e:
             logger.error(f"Manual calibration failed: {e}")
             self.audio_processor.speak_immediately("Calibration error occurred")
+
 
     def show_calibration_status(self):
         """Show current calibration status"""
