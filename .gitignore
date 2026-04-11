@@ -1,0 +1,23 @@
+# Environments
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+
+# IDE
+.vscode/
+
+# Models
+models/
+*.pt
+*.pth
+*.onnx
+
+# Data and logs
+data/
+logs/

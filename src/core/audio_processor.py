@@ -536,4 +536,4 @@ class AudioProcessor:
     
     def test_audio(self):
         """Test audio"""
-        self.speak_immediately("VisionGuide AI audio test. Sequential speech working correctly.")
+        self.speak_immediately("NAVIS AI audio test. Sequential speech working correctly.")

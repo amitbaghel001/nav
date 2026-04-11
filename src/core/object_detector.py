@@ -19,7 +19,7 @@ class DetectedObject:
     direction: Optional[str] = None
 
 class ObjectDetector:
-    def __init__(self, model_path: str = "yolov8n.pt", device: str = "auto"):
+    def __init__(self, model_path: str = "yolov8m-oiv7.pt", device: str = "auto"):
         """
         Initialize YOLO object detector
         
@@ -48,50 +48,41 @@ class ObjectDetector:
             logger.error(f"Failed to load model: {e}")
             raise
     
-    def detect_objects(self, frame: np.ndarray, 
-                      confidence_threshold: float = 0.5,
-                      iou_threshold: float = 0.45) -> List[DetectedObject]:
+    def detect_objects(self, frame: np.ndarray,
+                    confidence_threshold: float = 0.5,
+                    iou_threshold: float = 0.45) -> List[DetectedObject]:
         """
-        Detect objects in frame
-        
-        Args:
-            frame: Input image frame
-            confidence_threshold: Minimum confidence for detection
-            iou_threshold: IoU threshold for NMS
-            
-        Returns:
-            List of detected objects
+        Detect objects in frame with smart filtering
         """
         try:
             # Run inference
-            results = self.model(frame, 
-                               conf=confidence_threshold,
-                               iou=iou_threshold,
-                               verbose=False)
-            
+            results = self.model(frame,
+                            conf=confidence_threshold,
+                            iou=iou_threshold,
+                            verbose=False)
+
             detected_objects = []
-            
             for result in results:
                 boxes = result.boxes
                 if boxes is not None:
                     for box in boxes:
                         # Extract box information
                         x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
-                        confidence = box.conf[0].cpu().numpy()
-                        class_id = int(box.cls[0].cpu().numpy())
-                        
+                        confidence = box.conf.cpu().numpy()
+                        class_id = int(box.cls.cpu().numpy())
+
                         # Calculate center point and area
                         center_x = int((x1 + x2) / 2)
                         center_y = int((y1 + y2) / 2)
                         area = (x2 - x1) * (y2 - y1)
-                        
+
                         # Get class name
                         class_name = self.class_names[class_id]
-                        
+
                         # Calculate direction relative to frame center
                         frame_center_x = frame.shape[1] // 2
                         direction = self._calculate_direction(center_x, frame_center_x)
-                        
+
                         detected_obj = DetectedObject(
                             class_id=class_id,
                             class_name=class_name,
@@ -101,15 +92,49 @@ class ObjectDetector:
                             area=area,
                             direction=direction
                         )
-                        
+
                         detected_objects.append(detected_obj)
+
+            # ADD THIS: Apply smart filtering
+            filtered_objects = self.filter_redundant_detections(detected_objects)
             
-            return detected_objects
-            
+            return filtered_objects
+
         except Exception as e:
             logger.error(f"Object detection failed: {e}")
             return []
+
     
+    def filter_redundant_detections(self, detected_objects: List[DetectedObject]) -> List[DetectedObject]:
+        """Filter out redundant objects when person is detected"""
+        
+        # Define object hierarchies
+        person_classes = {'person', 'man', 'woman', 'human', 'boy', 'girl'}
+        clothing_classes = {'shirt', 't-shirt', 'top', 'blouse', 'jacket', 'coat', 'dress'}
+        accessory_classes = {'glasses', 'sunglasses', 'hat', 'cap', 'helmet', 'mask'}
+        body_part_classes = {'human face', 'face', 'head', 'hand', 'arm', 'leg'}
+        
+        # Classes to remove when person is detected
+        classes_to_remove_with_person = clothing_classes | accessory_classes | body_part_classes
+        
+        # Check if any person class is detected
+        detected_class_names = {obj.class_name.lower() for obj in detected_objects}
+        has_person = bool(detected_class_names & person_classes)
+        
+        if has_person:
+            # Keep only non-redundant objects
+            filtered_objects = []
+            for obj in detected_objects:
+                if obj.class_name.lower() not in classes_to_remove_with_person:
+                    filtered_objects.append(obj)
+            
+            logger.info(f"Filtered out {len(detected_objects) - len(filtered_objects)} redundant objects")
+            return filtered_objects
+        else:
+            # No person detected, keep all objects
+            return detected_objects
+
+
     def _calculate_direction(self, object_center_x: int, frame_center_x: int) -> str:
         """Calculate object direction relative to frame center"""
         diff = object_center_x - frame_center_x

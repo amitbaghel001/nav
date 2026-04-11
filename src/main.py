@@ -20,9 +20,13 @@ from core.scene_tracker import SceneTracker
 from core.audio_processor import AudioProcessor, AudioPriority
 from utils.config import config
 
+from ui.main_window import VisionGuideMainWindow
+from PyQt5.QtWidgets import QApplication
+import sys
+
 class VisionGuideAI:
     def __init__(self):
-        """Initialize VisionGuide AI system"""
+        """Initialize NAVIS AI system"""
         self.running = False
         self.camera = None
         self.should_exit = False
@@ -45,8 +49,13 @@ class VisionGuideAI:
         self.last_summary_time = 0
 
         self.easy_calibrator = EasyCalibrator(self.depth_estimator)
+
+        # Add frame sharing
+        self.current_frame = None
+        self.processed_frame = None
+        self.frame_lock = threading.Lock()
         
-        logger.info("VisionGuide AI initialized successfully")
+        logger.info("NAVIS AI initialized successfully")
     
     def start_camera(self) -> bool:
         """Start camera capture"""
@@ -118,12 +127,7 @@ class VisionGuideAI:
             return "Unable to process scene"
     
     def run_detection_loop(self):
-        """Main detection loop with smart announcements"""
-        
-        # Create window
-        cv2.namedWindow('VisionGuide AI', cv2.WINDOW_NORMAL)
-        cv2.resizeWindow('VisionGuide AI', config.frame_width, config.frame_height)
-        
+        """Modified detection loop for GUI with periodic summaries"""
         while self.running and not self.should_exit:
             try:
                 ret, frame = self.camera.read()
@@ -131,156 +135,96 @@ class VisionGuideAI:
                     logger.warning("Failed to read frame from camera")
                     time.sleep(0.1)
                     continue
-                
-                # Fix camera mirroring - flip horizontally
-                frame = cv2.flip(frame, 1)  # 1 = horizontal flip
+
+                # Fix camera mirroring
+                frame = cv2.flip(frame, 1)
+
+                # Store current frame for GUI
+                with self.frame_lock:
+                    self.current_frame = frame.copy()
 
                 # Detect objects
                 detected_objects = self.object_detector.detect_objects(
-                    frame, 
+                    frame,
                     config.model.confidence_threshold,
                     config.model.iou_threshold
                 )
-                
+
                 # Estimate depth for detected objects
                 depth_map = self.depth_estimator.estimate_depth(frame)
                 for obj in detected_objects:
                     obj.distance = self.depth_estimator.get_object_distance(
                         depth_map, obj.bbox, config.navigation.step_size
                     )
-                
-                # Update scene tracker and get changes
-                changes = self.scene_tracker.update_scene(detected_objects)
-                
-                # Announce meaningful changes only
-                if changes and self.auto_announce_changes:
-                    if self.scene_tracker.should_announce():
-                        # Filter out rapid changes and only keep meaningful ones
-                        meaningful_changes = []
-                        for change_type, message in changes.items():
-                            if message and not self._is_rapid_change(change_type):
-                                meaningful_changes.append(message)
-                        
-                        if meaningful_changes:
-                            # Limit to 2 most important changes
-                            announcement = ". ".join(meaningful_changes[:2])
-                            self.audio_processor.speak_async(announcement, AudioPriority.HIGH)
-                            self.last_description = announcement
-                            logger.info(f"Smart announcement: {announcement}")
-                
-                # Periodic scene summary (less frequent)
-                current_time = time.time()
-                if current_time - self.last_summary_time >= self.periodic_summary_interval:
-                    summary = self.scene_tracker.get_scene_summary()
-                    if summary and "analyzing" not in summary.lower():
-                        self.audio_processor.speak_async(f"Scene update: {summary}", AudioPriority.LOW)
-                        logger.info(f"Scene summary: {summary}")
-                    self.last_summary_time = current_time
-                
-                # Display frame with detections
+
+                # Create processed frame with detections
                 display_frame = self.object_detector.draw_detections(
                     frame.copy(), detected_objects
                 )
-                
+
                 # Add distance information to display
                 for obj in detected_objects:
                     if obj.distance:
                         x1, y1, x2, y2 = obj.bbox
-                        
-                        # Format distance display
                         distance_steps = obj.distance
-                        distance_meters = distance_steps * config.navigation.step_size
-                        
-                        # Choose appropriate display format
                         if distance_steps < 1.5:
                             distance_text = f"very close"
-                            color = (0, 0, 255)  # Red for very close
+                            color = (0, 0, 255)
                         elif distance_steps < 3.0:
                             distance_text = f"{distance_steps:.1f} steps"
-                            color = (0, 165, 255)  # Orange for close
+                            color = (0, 165, 255)
                         else:
                             distance_text = f"{distance_steps:.0f} steps"
-                            color = (0, 255, 0)  # Green for far
-                        
-                        # Display with colored text
+                            color = (0, 255, 0)
                         cv2.putText(display_frame, distance_text,
                                 (x1, y2 + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
-                
-                # Add control instructions
-                # Update the control instructions to include the new help command
-                instructions = [
-                    "VisionGuide AI - Ready:",
-                    "Q - Quit",
-                    "D - Describe scene",
-                    "V - Voice command",
-                    "C - Calibrate distance",
-                    "I - Calibration info",
-                    "X - Reset calibration"
-                ]
-                
-                y_offset = 30
-                for instruction in instructions:
-                    cv2.putText(display_frame, instruction, 
-                               (10, y_offset), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-                    y_offset += 25
-                
-                # Add mode indicator
-                mode_text = "AUTO-ANNOUNCE: ON" if self.auto_announce_changes else "AUTO-ANNOUNCE: OFF"
-                cv2.putText(display_frame, mode_text, 
-                           (10, display_frame.shape[0] - 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
-                
-                # Add speaking indicator
-                if self.audio_processor.is_speaking:
-                    cv2.putText(display_frame, "SPEAKING...", 
-                               (10, display_frame.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                
-                cv2.imshow('VisionGuide AI', display_frame)
-                
-                # Handle keyboard input
-                key = cv2.waitKey(1) & 0xFF
-                
-                if key == ord('q') or key == ord('Q'):
-                    logger.info("Quit key pressed")
-                    self.should_exit = True
-                    break
-                    
-                        
-                elif key == ord('v') or key == ord('V'):
-                    # Enhanced voice command mode - PASS detected_objects
-                    if not self.audio_processor._is_listening:
-                        self.handle_voice_command(frame, detected_objects)  # ADD detected_objects HERE
-                    else:
-                        self.audio_processor.speak_immediately("Already listening, please wait")
-                        
 
-                # ADD THESE NEW CONTROLS AFTER THE SPACE KEY HANDLER:
-                elif key == ord('c') or key == ord('C'):
-                    # Manual calibration mode
-                    self.manual_calibration_mode(frame, detected_objects)
+                # Store processed frame for GUI
+                with self.frame_lock:
+                    self.processed_frame = display_frame.copy()
 
-                elif key == ord('d') or key == ord('D'):
-                    # Current scene summary
+                # Update scene tracker and handle announcements
+                changes = self.scene_tracker.update_scene(detected_objects)
+                if changes and self.auto_announce_changes:
+                    if self.scene_tracker.should_announce():
+                        meaningful_changes = []
+                        for change_type, message in changes.items():
+                            if message and not self._is_rapid_change(change_type):
+                                meaningful_changes.append(message)
+                        if meaningful_changes:
+                            announcement = ". ".join(meaningful_changes[:2])
+                            self.audio_processor.speak_async(announcement, AudioPriority.HIGH)
+                            self.last_description = announcement
+                            logger.info(f"Smart announcement: {announcement}")
+
+                # ADD THIS: Periodic scene summary (RESTORED)
+                current_time = time.time()
+                if current_time - self.last_summary_time >= self.periodic_summary_interval:
                     summary = self.scene_tracker.get_scene_summary()
-                    self.audio_processor.speak_async(summary, AudioPriority.HIGH)
-                    logger.info(f"Manual scene summary: {summary}")
+                    if summary and "analyzing" not in summary.lower():
+                        # Only announce if not currently speaking or listening
+                        if (not self.audio_processor.is_speaking and 
+                            not getattr(self.audio_processor, '_is_listening', False)):
+                            self.audio_processor.speak_async(f"Scene update: {summary}", AudioPriority.LOW)
+                            logger.info(f"Periodic scene summary: {summary}")
+                    self.last_summary_time = current_time
 
-                elif key == ord('i') or key == ord('I'):
-                    # Show calibration status
-                    self.show_calibration_status()
-
-                elif key == ord('x') or key == ord('X'):
-                    # Reset calibration
-                    self.reset_calibration()
-                
-                # Small delay
                 time.sleep(0.03)
-                    
+
             except Exception as e:
                 logger.error(f"Detection loop error: {e}")
                 time.sleep(0.1)
-        
-        # Clean up
-        cv2.destroyAllWindows()
+
+
+    def get_current_frame(self):
+        """Get current raw frame"""
+        with self.frame_lock:
+            return self.current_frame.copy() if self.current_frame is not None else None
+    
+    def get_processed_frame(self):
+        """Get processed frame with detections"""
+        with self.frame_lock:
+            return self.processed_frame.copy() if self.processed_frame is not None else None
 
     def _is_rapid_change(self, change_type: str) -> bool:
         """Check if this is a rapid change that should be filtered"""
@@ -342,7 +286,7 @@ class VisionGuideAI:
 
     
     def start(self):
-        """Start the VisionGuide AI system"""
+        """Start the NAVIS AI system"""
         if not self.start_camera():
             return False
         
@@ -354,23 +298,23 @@ class VisionGuideAI:
         
         
         # Welcome message
-        self.audio_processor.speak_immediately("Welcome to the VisionGuide AI . Press S for scene description, V for voice commands and C To Calibrate Distance.")
+        self.audio_processor.speak_immediately("Welcome to the NAVIS AI . Press S for scene description, V for voice commands and C To Calibrate Distance.")
         
         # Start detection thread
         self.detection_thread = threading.Thread(target=self.run_detection_loop)
         self.detection_thread.daemon = True
         self.detection_thread.start()
         
-        logger.info("VisionGuide AI started")
+        logger.info("NAVIS AI started")
         return True
     
     def stop(self):
-        """Stop the VisionGuide AI system"""
+        """Stop the NAVIS AI system"""
         self.running = False
         self.should_exit = True
         
         # Goodbye message
-        self.audio_processor.speak_immediately("VisionGuide AI is shutting down. Goodbye.")
+        self.audio_processor.speak_immediately("NAVIS AI is shutting down. Goodbye.")
         
         # Wait for thread to finish
         if self.detection_thread:
@@ -385,7 +329,7 @@ class VisionGuideAI:
         # Close windows
         cv2.destroyAllWindows()
         
-        logger.info("VisionGuide AI stopped")
+        logger.info("NAVIS AI stopped")
     
     def add_known_person(self, name: str, image_path: str) -> bool:
         """Add a known person to the system"""
@@ -498,40 +442,38 @@ def signal_handler(signum, frame):
     sys.exit(0)
 
 def main():
-    """Main function"""
-    global vision_guide
+    """Main function with integrated GUI"""
+    app = QApplication(sys.argv)
     
     # Set up signal handler for Ctrl+C
-    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGINT, lambda s, f: app.quit())
     
     # Initialize logging
-    logger.add("logs/visionguide.log", rotation="10 MB")
+    logger.add("logs/NAVIS.log", rotation="10 MB")
     
     # Create VisionGuide AI instance
     vision_guide = VisionGuideAI()
     
     try:
-        # Start the system
+        # Start the vision system
         if vision_guide.start():
-            logger.info("VisionGuide AI Smart Mode is running.")
+            logger.info("NAVIS AI started successfully")
             
-            # Keep main thread alive
-            while vision_guide.running and not vision_guide.should_exit:
-                try:
-                    time.sleep(0.1)
-                except KeyboardInterrupt:
-                    logger.info("Keyboard interrupt received")
-                    break
+            # Create and show GUI
+            main_window = VisionGuideMainWindow(vision_guide)
+            main_window.show()
+            
+            # Run the application
+            sys.exit(app.exec_())
         else:
-            logger.error("Failed to start VisionGuide AI")
-    
+            logger.error("Failed to start NAVIS AI")
+            
     except Exception as e:
         logger.error(f"Main loop error: {e}")
-    
     finally:
-        # Clean shutdown
         vision_guide.stop()
-        logger.info("VisionGuide AI shutdown complete")
+        logger.info("NAVIS AI shutdown complete")
+
 
 if __name__ == "__main__":
     main()

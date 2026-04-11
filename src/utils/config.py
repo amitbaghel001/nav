@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 class ModelConfig(BaseModel):
-    yolo_model_path: str = "yolov8n.pt"
+    yolo_model_path: str = "yolov8m-oiv7.pt"
     depth_model_type: str = "MiDaS_small"
     face_recognition_model: str = "models/face_recognition"
     confidence_threshold: float = 0.5
