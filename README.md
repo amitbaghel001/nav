@@ -20,8 +20,7 @@
 3. [Prerequisites](#-prerequisites)
 4. [Installation](#-installation)
 5. [Usage & Commands](#-usage--commands)
-6. [NAVIS Output Setup](#-navis-output-setup)
-7. [Project Structure](#-project-structure)
+6. [Project Structure](#-project-structure)
 
 ---
 
@@ -110,19 +109,6 @@ If you have the GUI window active, you can use these shortcuts:
 1. *"Describe the scene."* (The system will analyze and read aloud all active surroundings)
 2. *"Status."* (Get system health and calibration data)
 3. *"Calibrate."* (Allows adding custom scaling factors based on known distances)
-
----
-
-## 🖼️ NAVIS Output Setup
-
-> **Note to Contributors / Users:**  
-> Use this section to showcase real-world outputs, annotated images, and GUI screenshots of the AI in action.
-> 
-> *[Add your screenshots here]*
-> 
-> **Descriptions:**
-> * *Screenshot 1:* YOLOv8 actively detecting people and estimating distance.
-> * *Screenshot 2:* GUI interface displaying system status.
 
 ---
 
