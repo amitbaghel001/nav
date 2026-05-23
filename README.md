@@ -1,271 +1,134 @@
-# 🌟 NAVIS AI — Navigational Audio & Vision Inference System 🌟
+<div align="center">
+  <h1>🌟 VISION GUIDE AI / NAVIS AI 🌟</h1>
+  <p><em>An advanced auditory and navigation interface system for the visually impaired.</em></p>
 
-> An AI-powered multimodal assistive navigation system enabling real-time scene understanding, voice interaction, and intelligent environmental awareness for visually impaired individuals.
+  [![Python](https://img.shields.io/badge/Python-3.13+-blue.svg)](https://www.python.org/)
+  [![PyTorch](https://img.shields.io/badge/PyTorch-2.4.0+-EE4C2C.svg)](https://pytorch.org/)
+  [![OpenCV](https://img.shields.io/badge/OpenCV-4.10+-green.svg)](https://opencv.org/)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+</div>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-AI-blue?style=for-the-badge&logo=python"/>
-  <img src="https://img.shields.io/badge/YOLOv8-Object%20Detection-green?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/OpenCV-Computer%20Vision-orange?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/Voice-AI%20Assistant-red?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/License-MIT-black?style=for-the-badge"/>
+  <b>NAVIS AI</b> acts as a reliable smart co-pilot for visually impaired individuals, turning real-world scenes into rich auditory descriptions and intelligent voice interactions in real-time.
 </p>
 
 ---
 
-NAVIS AI acts as a reliable smart co-pilot for visually impaired individuals, transforming real-world scenes into rich auditory descriptions and intelligent voice interactions in real-time.
-
-The system combines:
-- 👁️ Real-time object detection
-- 📏 Depth estimation
-- 🎤 Voice interaction
-- 🧠 Intelligent scene understanding
-- 🚨 Safety-focused navigation assistance
-
-to create an advanced accessibility-focused AI system.
+## 📑 Table of Contents
+1. [Key Features](#-key-features)
+2. [Architecture Overview](#-architecture-overview)
+3. [Prerequisites](#-prerequisites)
+4. [Installation](#-installation)
+5. [Usage & Commands](#-usage--commands)
+6. [Project Structure](#-project-structure)
 
 ---
 
-# 📑 Table of Contents
+## 🚀 Key Features
 
-- 🚀 Key Features
-- 🧭 Architecture Overview
-- 💻 Prerequisites
-- 🛠 Installation
-- 🕹 Usage & Commands
-- 🎮 Keyboard Controls
-- 🎤 Sample Voice Commands
-- 💻 Tech Stack
-- 📁 Project Structure
-- 🌍 Vision & Impact
-- 🔮 Future Improvements
+* **Real-time Object Detection:** Identifies obstacles and objects utilizing `YOLOv8`.
+* **Depth & Distance Estimation:** Accurately calculates the exact distance (in steps or meters) to potential obstacles.
+* **Smart Scene Analyzer:** Periodically summarizes your surroundings, tracking new or missing objects while limiting noise.
+* **Personalized Face Recognition:** Recognizes friends and family dynamically so you always know who is around you.
+* **Intelligent Voice Assistant:** Interact seamlessly via voice commands. Ask for scene descriptions or trigger calibrations purely by talking!
+* **Emergency & GPS:** Provides built-in capability for location tracking and emergency contacts.
+* **Graphical Control Interface:** Contains a local GUI (using `PyQt5`) for easy troubleshooting and status monitoring.
 
 ---
 
-# 🚀 Key Features
+## 🧭 Architecture Overview
 
-## 👁️ AI-Powered Object Detection
-Identifies surrounding obstacles and objects using **YOLOv8**, enabling continuous environmental awareness and safer navigation.
-
----
-
-## 📏 Depth & Distance Estimation
-Accurately estimates obstacle distance using depth estimation models to help users understand nearby surroundings spatially.
-
----
-
-## 🧠 Intelligent Scene Analyzer
-Periodically summarizes surroundings by:
-- Tracking newly appearing objects
-- Detecting missing objects
-- Reducing repetitive auditory clutter
-
----
-
-## 👤 Personalized Face Recognition
-Recognizes familiar individuals dynamically, helping users identify nearby friends and family members.
-
----
-
-## 🎤 Conversational Voice Assistant
-Interact seamlessly using voice commands for:
-- Scene descriptions
-- Calibration
-- Status monitoring
-- Navigation assistance
-
-Fully hands-free and accessibility-oriented.
-
----
-
-## 🚨 Emergency & GPS Support
-Includes foundational support for:
-- Location tracking
-- Emergency workflows
-- Safety-oriented interaction systems
-
----
-
-## 🖥️ Interactive Monitoring Dashboard
-Provides a local PyQt5-based GUI for:
-- Troubleshooting
-- Monitoring system status
-- Calibration control
-- AI pipeline visualization
-
----
-
-# 🧭 Architecture Overview
-
-<p align="center">
-  <img src="./screenshots/architecture.png" width="1000"/>
-</p>
-
-<p align="center">
-  <b>Real-time multimodal AI pipeline powering NAVIS AI</b>
-</p>
-
----
-
-# 💻 Prerequisites
-
-- Python 3.13 or newer
-- Windows / Linux / macOS
-- Webcam / Camera required
-
----
-
-# 🛠 Installation
-
-## 1️⃣ Clone the Repository
-
-```bash
-git clone https://github.com/amitbaghel001/NAVIS-AI-Assistive-Vision-System.git
-cd NAVIS-AI-Assistive-Vision-System
+```mermaid
+graph TD
+    A[Camera Input] --> B(YOLO Object Detection)
+    A --> C(Face Recognition)
+    A --> D(Depth Estimator)
+    
+    B --> E{Scene Analyzer & Tracker}
+    C --> E
+    D --> E
+    
+    E --> F((Audio Processor))
+    
+    G[Voice Commands / Keys] --> F
+    F --> H[Auditory Output: Speech]
+    F --> I[System Callbacks: Calibration, Status]
 ```
 
 ---
 
-## 2️⃣ Create a Virtual Environment
+## 💻 Prerequisites
 
+- **Python:** `3.13` or newer
+- **OS:** Windows / Linux / macOS
+- **Hardware:** Webcam/Camera required.
+
+---
+
+## 🛠 Installation
+
+**1. Clone the Repository:**
+```bash
+git clone https://github.com/Amaan3073/VisionGuide.git
+cd VisionGuide
+```
+
+**2. Create a Virtual Environment (Recommended):**
 ```bash
 python -m venv venv
-```
-
-### Windows
-
-```bash
+# Windows
 venv\Scripts\activate
-```
-
-### Linux / macOS
-
-```bash
+# Unix/MacOS
 source venv/bin/activate
 ```
 
----
-
-## 3️⃣ Install Dependencies
-
+**3. Install Dependencies:**
 ```bash
 pip install -r requirements.txt
 ```
 
 ---
 
-# 🕹 Usage & Commands
+## 🕹 Usage & Commands
 
-Run the main application interface:
-
+Run the main application interface by executing:
 ```bash
 python src/main.py
 ```
+> **Note:** On your first run, YOLO models (`.pt`) and Transformer models might automatically download weights.
 
-> On first launch, required AI model weights may automatically download.
+### 🎮 Keyboard Controls
+If you have the GUI window active, you can use these shortcuts:
+- <kbd>S</kbd> : Trigger an immediate descriptive summary of the scene.
+- <kbd>V</kbd> : Start voice command mode (Say things like "Describe scene", or "Status").
+- <kbd>C</kbd> : Initiate manual depth calibration mode.
+- <kbd>M</kbd> : Request current calibration metrics & status.
+- <kbd>Q</kbd> : Quit/Interrupt active process or calibration.
+
+### 🎤 Sample Voice Commands
+1. *"Describe the scene."* (The system will analyze and read aloud all active surroundings)
+2. *"Status."* (Get system health and calibration data)
+3. *"Calibrate."* (Allows adding custom scaling factors based on known distances)
 
 ---
 
-# 🎮 Keyboard Controls
-
-| Key | Function |
-|------|----------|
-| S | Trigger immediate scene summary |
-| V | Start voice interaction mode |
-| C | Manual depth calibration |
-| M | Request calibration metrics |
-| Q | Quit current process |
-
----
-
-# 🎤 Sample Voice Commands
+## 📁 Project Structure
 
 ```text
-"Describe the scene."
-"Status."
-"Calibrate."
-"What's around me?"
-```
-
----
-
-# 💻 Tech Stack
-
-## Core Technologies
-- Python
-- PyTorch
-- OpenCV
-- YOLOv8
-- MiDaS
-- PyQt5
-
-## AI / ML Components
-- Object Detection
-- Depth Estimation
-- Scene Understanding
-- Voice Interaction
-- Audio Feedback Systems
-
----
-
-# 📁 Project Structure
-
-```bash
-NAVIS-AI/
+VisionGuide-AI/
 ├── src/
-│   ├── main.py              # Application Entry Point & NAVIS AI Core
-│   ├── core/                # Detection, Depth, Audio & Tracking Systems
-│   ├── ui/                  # PyQt5 Frontend Interface
-│   └── utils/               # Configurations & Helper Modules
-│
-├── tests/                   # Base Unit Tests
-├── test_basic.py            # Hardware Validation Script
-├── requirements.txt         # Python Dependencies
-└── README.md
+│   ├── main.py              # Application Entry Point & NAVIS AI Class
+│   ├── core/                # Core AI Engine (Detector, Depth, Audio, Trackers)
+│   ├── ui/                  # PyQt5 Frontend
+│   └── utils/               # Configurations and helper scripts
+├── tests/                   # Base unit tests
+├── test_basic.py            # Quick hardware validation script
+├── requirements.txt         # Package dependencies
+└── .gitignore               # Ignored environments and AI models
 ```
 
 ---
 
-# 🌍 Vision & Impact
-
-NAVIS AI was built with the goal of empowering visually impaired individuals through intelligent accessibility technology.
-
-The project focuses on combining AI, computer vision, and real-time interaction systems to create safer and more independent navigation experiences.
-
----
-
-# 🔮 Future Improvements
-
-- Smart wearable integration
-- Edge-device optimization
-- Real-time GPS navigation assistance
-- Multilingual voice interaction
-- Context-aware AI guidance
-- Lightweight mobile deployment
-- AI-powered contextual memory system
-
----
-
-# 👨‍💻 Author
-
-## Amit Baghel
-
-AI/ML Developer passionate about:
-- Computer Vision
-- Intelligent Systems
-- Accessibility-focused AI
-- Real-world AI applications
-
-- LinkedIn: https://linkedin.com/in/amit0baghel
-- GitHub: https://github.com/amitbaghel001
-
----
-
-# ❤️ Final Note
-
-> “Building AI systems that transform accessibility into independence.”
-
----
-
-# ⭐ Support
-
-If you found this project useful, consider giving it a ⭐ on GitHub.
+<div align="center">
+  <i>"Empowering visually impaired individuals to navigate the world independently."</i>
+</div>
