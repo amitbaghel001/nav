@@ -1,1 +1,73 @@
-VISION GUIDE AI / NAVIS AI 🌟 An advanced auditory and navigation interface system for the visually impaired. Python PyTorch OpenCV License: MIT NAVIS AI acts as a reliable smart co-pilot for visually impaired individuals, turning real-world scenes into rich auditory descriptions and intelligent voice interactions in real-time. 📑 Table of Contents Key Features Architecture Overview Prerequisites Installation Usage & Commands Project Structure 🚀 Key Features Real-time Object Detection: Identifies obstacles and objects utilizing YOLOv8. Depth & Distance Estimation: Accurately calculates the exact distance (in steps or meters) to potential obstacles. Smart Scene Analyzer: Periodically summarizes your surroundings, tracking new or missing objects while limiting noise. Personalized Face Recognition: Recognizes friends and family dynamically so you always know who is around you. Intelligent Voice Assistant: Interact seamlessly via voice commands. Ask for scene descriptions or trigger calibrations purely by talking! Emergency & GPS: Provides built-in capability for location tracking and emergency contacts. Graphical Control Interface: Contains a local GUI (using PyQt5) for easy troubleshooting and status monitoring. 🧭 Architecture Overview 💻 Prerequisites Python: 3.13 or newer OS: Windows / Linux / macOS Hardware: Webcam/Camera required. 🛠 Installation 1. Clone the Repository: git clone https://github.com/amitbaghel001/nav cd VisionGuide 2. Create a Virtual Environment (Recommended): python -m venv venv # Windows venv\Scripts\activate # Unix/MacOS source venv/bin/activate 3. Install Dependencies: pip install -r requirements.txt 🕹 Usage & Commands Run the main application interface by executing: python src/main.py Note: On your first run, YOLO models (.pt) and Transformer models might automatically download weights. 🎮 Keyboard Controls If you have the GUI window active, you can use these shortcuts: S : Trigger an immediate descriptive summary of the scene. V : Start voice command mode (Say things like "Describe scene", or "Status"). C : Initiate manual depth calibration mode. M : Request current calibration metrics & status. Q : Quit/Interrupt active process or calibration. 🎤 Sample Voice Commands "Describe the scene." (The system will analyze and read aloud all active surroundings) "Status." (Get system health and calibration data) "Calibrate." (Allows adding custom scaling factors based on known distances) 📁 Project Structure VisionGuide-AI/ ├── src/ │ ├── main.py # Application Entry Point & NAVIS AI Class │ ├── core/ # Core AI Engine (Detector, Depth, Audio, Trackers) │ ├── ui/ # PyQt5 Frontend │ └── utils/ # Configurations and helper scripts ├── tests/ # Base unit tests ├── test_basic.py # Quick hardware validation script ├── requirements.txt # Package dependencies └── .gitignore # Ignored environments and AI models "Empowering visually impaired individuals to navigate the world independently."
+🌟 VISION GUIDE AI / NAVIS AI 🌟
+An advanced auditory and navigation interface system for the visually impaired.
+
+Python PyTorch OpenCV License: MIT
+
+NAVIS AI acts as a reliable smart co-pilot for visually impaired individuals, turning real-world scenes into rich auditory descriptions and intelligent voice interactions in real-time.
+
+📑 Table of Contents
+Key Features
+Architecture Overview
+Prerequisites
+Installation
+Usage & Commands
+Project Structure
+🚀 Key Features
+Real-time Object Detection: Identifies obstacles and objects utilizing YOLOv8.
+Depth & Distance Estimation: Accurately calculates the exact distance (in steps or meters) to potential obstacles.
+Smart Scene Analyzer: Periodically summarizes your surroundings, tracking new or missing objects while limiting noise.
+Personalized Face Recognition: Recognizes friends and family dynamically so you always know who is around you.
+Intelligent Voice Assistant: Interact seamlessly via voice commands. Ask for scene descriptions or trigger calibrations purely by talking!
+Emergency & GPS: Provides built-in capability for location tracking and emergency contacts.
+Graphical Control Interface: Contains a local GUI (using PyQt5) for easy troubleshooting and status monitoring.
+🧭 Architecture Overview
+
+💻 Prerequisites
+Python: 3.13 or newer
+OS: Windows / Linux / macOS
+Hardware: Webcam/Camera required.
+🛠 Installation
+1. Clone the Repository:
+
+git clone https://github.com/amitbaghel001/nav
+cd VisionGuide
+2. Create a Virtual Environment (Recommended):
+
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# Unix/MacOS
+source venv/bin/activate
+3. Install Dependencies:
+
+pip install -r requirements.txt
+🕹 Usage & Commands
+Run the main application interface by executing:
+
+python src/main.py
+Note: On your first run, YOLO models (.pt) and Transformer models might automatically download weights.
+
+🎮 Keyboard Controls
+If you have the GUI window active, you can use these shortcuts:
+
+S : Trigger an immediate descriptive summary of the scene.
+V : Start voice command mode (Say things like "Describe scene", or "Status").
+C : Initiate manual depth calibration mode.
+M : Request current calibration metrics & status.
+Q : Quit/Interrupt active process or calibration.
+🎤 Sample Voice Commands
+"Describe the scene." (The system will analyze and read aloud all active surroundings)
+"Status." (Get system health and calibration data)
+"Calibrate." (Allows adding custom scaling factors based on known distances)
+📁 Project Structure
+VisionGuide-AI/
+├── src/
+│   ├── main.py              # Application Entry Point & NAVIS AI Class
+│   ├── core/                # Core AI Engine (Detector, Depth, Audio, Trackers)
+│   ├── ui/                  # PyQt5 Frontend
+│   └── utils/               # Configurations and helper scripts
+├── tests/                   # Base unit tests
+├── test_basic.py            # Quick hardware validation script
+├── requirements.txt         # Package dependencies
+└── .gitignore               # Ignored environments and AI models
+"Empowering visually impaired individuals to navigate the world independently."
