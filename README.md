@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>🌟 VISION GUIDE AI / NAVIS AI 🌟</h1>
+  <h1>🌟 NAVIS -Navigational Audio & Vision Inference system 🌟</h1>
   <p><em>An advanced auditory and navigation interface system for the visually impaired.</em></p>
 
   [![Python](https://img.shields.io/badge/Python-3.13+-blue.svg)](https://www.python.org/)
